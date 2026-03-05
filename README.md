@@ -1,6 +1,6 @@
 # FPGA UART (TX + RX)
 
-This project implements a basic UART transmitter and receiver in Verilog.
+This project implements a basic UART transmitter and receiver in VHDL.
 
 ## Features
 - FSM-based UART RX and TX modules
