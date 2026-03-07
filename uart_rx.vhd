@@ -85,23 +85,23 @@ begin
                     end if;
 
 
-                when DATA =>
-
-                    if baud_counter = BAUD_DIV - 1 then
-                        baud_counter <= 0;
-
-                        shift_reg(bit_index) <= rx_clean;
-                        bit_index <= bit_index + 1;
-
-                        if bit_index = 7 then
-                            state <= STOP;
-                        end if;
-
-                    else
-                        baud_counter <= baud_counter + 1;
-                    end if;
-
-
+					when DATA =>
+					
+						 if baud_counter = BAUD_DIV - 1 then
+							  baud_counter <= 0;
+					
+							  shift_reg(bit_index) <= rx_clean;
+					
+							  if bit_index = 7 then
+									state <= STOP;
+							  else
+									bit_index <= bit_index + 1;
+							  end if;
+					
+						 else
+							  baud_counter <= baud_counter + 1;
+						 end if;
+				
                 when STOP =>
 
                     if baud_counter = BAUD_DIV - 1 then

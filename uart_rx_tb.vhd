@@ -1,72 +1,72 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity uart_rx_tb is
 end uart_rx_tb;
 
-architecture sim of uart_rx_tb is
+architecture behavior of uart_rx_tb is
 
-signal clk : std_logic := '0';
-signal rst : std_logic := '0';
-signal rx  : std_logic := '1';
-signal data_out : std_logic_vector(7 downto 0);
+    signal clk        : std_logic := '0';
+    signal rst        : std_logic := '1';
+    signal rx         : std_logic := '1';
+    signal data_out   : std_logic_vector(7 downto 0);
+    signal data_ready : std_logic;
+
+    constant BIT_TIME : time := 10 us; -- 100k baud
 
 begin
 
-dut: entity work.uart_rx
-port map(
-    clk => clk,
-    rx => rx,
-	 rst => rst,
-    data_out => data_out
-);
+    uut: entity work.uart_rx
+        port map (
+            clk        => clk,
+            rst        => rst,
+            rx         => rx,
+            data_out   => data_out,
+            data_ready => data_ready
+        );
 
-clk_process : process
-begin
-    clk <= '0';
-    wait for 10 ns;
-    clk <= '1';
-    wait for 10 ns;
-end process;
+    -- clock generation (50MHz)
+    clk_process : process
+    begin
+        clk <= '0';
+        wait for 10 ns;
+        clk <= '1';
+        wait for 10 ns;
+    end process;
 
-stim_proc: process
-begin
+    -- stimulus process
+    stim_proc : process
+    begin
 
-wait for 100 ns;
+        -- reset
+        wait for 100 ns;
+        rst <= '0';
 
-rx <= '0';
-wait for 104 us;
+        wait for 1 us;
 
-rx <= '1';
-wait for 104 us;
+        -- start bit
+        rx <= '0';
+        wait for BIT_TIME;
 
-rx <= '0';
-wait for 104 us;
+        -- send 0xA5 = 10100101 (LSB first)
+        rx <= '1'; wait for BIT_TIME;
+        rx <= '0'; wait for BIT_TIME;
+        rx <= '1'; wait for BIT_TIME;
+        rx <= '0'; wait for BIT_TIME;
+        rx <= '0'; wait for BIT_TIME;
+        rx <= '1'; wait for BIT_TIME;
+        rx <= '0'; wait for BIT_TIME;
+        rx <= '1'; wait for BIT_TIME;
 
-rx <= '1';
-wait for 104 us;
+        -- stop bit
+        rx <= '1';
+        wait for BIT_TIME;
 
-rx <= '0';
-wait for 104 us;
+        wait for 200 us;
 
-rx <= '1';
-wait for 104 us;
+        assert false report "Simulation Finished" severity failure;
 
-rx <= '0';
-wait for 104 us;
+    end process;
 
-rx <= '1';
-wait for 104 us;
-
-rx <= '0';
-wait for 104 us;
-
-rx <= '1';
-wait for 104 us;
-
-wait;
-
-end process;
-
-end sim;
+end behavior;
